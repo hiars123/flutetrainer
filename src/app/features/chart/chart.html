@@ -1,0 +1,80 @@
+<section class="stage">
+  <div class="card flute-card">
+    <app-flute
+      [instrument]="settings.instrument()"
+      [fingering]="current().fingering"
+      [caption]="'Griff für ' + current().name"
+    />
+  </div>
+
+  <div class="card detail">
+    <h2 class="prompt">Griff für <b>{{ current().name }}</b></h2>
+    <div class="staff-slot">
+      <app-staff
+        [song]="noteSong()"
+        [currentIndex]="0"
+        [viewWidth]="250"
+        [playheadX]="170"
+        [showTime]="false"
+        [showBars]="false"
+        [showPlayhead]="false"
+      />
+    </div>
+    <div class="actions">
+      <button type="button" class="ghost" (click)="hear()">Ton anhören</button>
+    </div>
+    <p class="note">
+      Tippe in der Liste auf einen Ton. Gefüllte Kreise sind zugedeckt, halb gefüllte nur zur Hälfte. Blau ist die
+      linke Hand, orange die rechte.
+    </p>
+  </div>
+</section>
+
+@for (g of groups(); track g.title) {
+  <section class="group" [attr.aria-label]="g.title">
+    <div class="group-head">
+      <h3>{{ g.title }}</h3>
+      <p>{{ g.hint }}</p>
+    </div>
+    <ul class="grid">
+      @for (r of g.rows; track r.midi) {
+        <li>
+          <button
+            type="button"
+            class="cell"
+            [attr.aria-pressed]="r.midi === current().midi"
+            [attr.aria-label]="'Griff für ' + r.name"
+            (click)="select(r)"
+          >
+            <span class="cell-name">{{ r.name }}</span>
+            <svg
+              class="mini"
+              [attr.viewBox]="'0 0 ' + miniWidth() + ' ' + holeR * 2"
+              [attr.width]="miniWidth()"
+              [attr.height]="holeR * 2"
+              aria-hidden="true"
+            >
+              @for (h of r.holes; track $index) {
+                <circle
+                  class="hole"
+                  [class.left]="h.left"
+                  [class.closed]="h.state === 1"
+                  [attr.cx]="h.cx"
+                  [attr.cy]="holeR"
+                  [attr.r]="holeR - 0.8"
+                />
+                @if (h.state === 0.5) {
+                  <path
+                    class="half"
+                    [class.left]="h.left"
+                    [attr.d]="'M' + (h.cx - holeR + 0.8) + ' ' + holeR + 'a' + (holeR - 0.8) + ' ' + (holeR - 0.8) + ' 0 0 0 ' + (holeR - 0.8) * 2 + ' 0z'"
+                  />
+                }
+              }
+            </svg>
+          </button>
+        </li>
+      }
+    </ul>
+  </section>
+}

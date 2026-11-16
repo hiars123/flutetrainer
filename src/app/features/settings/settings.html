@@ -1,0 +1,74 @@
+<div class="layout">
+  <section class="card options" aria-labelledby="h-floete">
+    <h2 id="h-floete">Deine Flöte</h2>
+
+    <div class="kinds" role="group" aria-label="Flötenart">
+      @for (k of kinds; track k.kind) {
+        <button
+          type="button"
+          class="kind"
+          [attr.aria-pressed]="instrument().kind === k.kind"
+          (click)="chooseKind(k.kind)"
+        >
+          <span class="kind-title">{{ k.title }}</span>
+          <span class="kind-text">{{ k.text }}</span>
+        </button>
+      }
+    </div>
+
+    @if (isRecorder()) {
+      <div class="system">
+        <h3 id="h-griff">Griffweise</h3>
+        <div class="seg" role="group" aria-labelledby="h-griff">
+          <button type="button" [attr.aria-pressed]="instrument().system === 'barock'" (click)="chooseSystem('barock')">
+            Barock
+          </button>
+          <button type="button" [attr.aria-pressed]="instrument().system === 'deutsch'" (click)="chooseSystem('deutsch')">
+            Deutsch
+          </button>
+        </div>
+        <p class="help">
+          So erkennst du sie: Ist das vierte Griffloch größer als das fünfte, hat deine Flöte die deutsche Griffweise.
+          Ist es kleiner, ist sie barock. Der Unterschied betrifft das F, das in der deutschen Griffweise ohne
+          Gabelgriff auskommt.
+        </p>
+        @if (instrument().system === 'deutsch') {
+          <p class="help note">Hinterlegt sind die Griffe bis zum hohen D.</p>
+        }
+      </div>
+    }
+  </section>
+
+  <section class="card preview" aria-label="Vorschau der gewählten Flöte">
+    <app-flute
+      [instrument]="instrument()"
+      [fingering]="sample().fingering"
+      [caption]="'Beispiel: Griff für ' + sample().name"
+    />
+    <p class="sample">Beispiel: Griff für <b>{{ sample().name }}</b></p>
+  </section>
+
+  <section class="card pro" aria-labelledby="h-pro">
+    <h2 id="h-pro">Pro-Funktionen <span class="badge">Vorschau</span></h2>
+    <div class="switch-row">
+      <div>
+        <p class="switch-title" id="mic-label">Mikrofon zum Mitspielen</p>
+        <p class="help" id="mic-help">
+          Die App hört zu und zeigt bei jeder Note, ob du sie getroffen hast. Im Lied erscheint dann ein
+          Mikrofon-Knopf. Es wird nichts aufgenommen oder gesendet.
+        </p>
+      </div>
+      <button
+        type="button"
+        class="switch"
+        role="switch"
+        [attr.aria-checked]="settings.microphoneFeature()"
+        aria-labelledby="mic-label"
+        aria-describedby="mic-help"
+        (click)="toggleMic()"
+      >
+        <span class="knob"></span>
+      </button>
+    </div>
+  </section>
+</div>

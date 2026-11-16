@@ -1,0 +1,111 @@
+<svg viewBox="0 0 270 590" role="img" [attr.aria-label]="description()" class="flute">
+  <defs>
+    <linearGradient id="wood" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#c99a58" />
+      <stop offset="0.35" stop-color="#ecd0a0" />
+      <stop offset="0.6" stop-color="#f3dfb8" />
+      <stop offset="1" stop-color="#c39150" />
+    </linearGradient>
+    <linearGradient id="woodDark" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#8f6532" />
+      <stop offset="0.45" stop-color="#bf8f52" />
+      <stop offset="1" stop-color="#85592a" />
+    </linearGradient>
+    <linearGradient id="plastic" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#1b3a52" />
+      <stop offset="0.4" stop-color="#2f6a95" />
+      <stop offset="1" stop-color="#173246" />
+    </linearGradient>
+    <linearGradient id="metal" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0" stop-color="#9aa6af" />
+      <stop offset="0.4" stop-color="#eef1f3" />
+      <stop offset="1" stop-color="#8793a0" />
+    </linearGradient>
+  </defs>
+
+  <!-- Hand-Klammern (rechts neben der Flöte) -->
+  <g class="hands" aria-hidden="true">
+    <line class="hand-line left" x1="216" x2="216" [attr.y1]="hands().left.y1" [attr.y2]="hands().left.y2" />
+    <text class="hand-text left" [attr.transform]="'translate(240 ' + hands().left.mid + ') rotate(90)'">linke Hand</text>
+    <line class="hand-line right" x1="216" x2="216" [attr.y1]="hands().right.y1" [attr.y2]="hands().right.y2" />
+    <text class="hand-text right" [attr.transform]="'translate(240 ' + hands().right.mid + ') rotate(90)'">rechte Hand</text>
+  </g>
+
+  @if (isRecorder()) {
+  <g aria-hidden="true">
+    <path class="beak" d="M112 12 Q130 2 148 12 L153 66 L107 66 Z" fill="url(#woodDark)" />
+    <rect x="108" y="64" width="44" height="500" rx="9" fill="url(#wood)" stroke="#7d5628" stroke-width="1.5" />
+    <path d="M114 76 h32 v22 h-32 z" fill="#2a1c10" />
+    <path d="M114 98 l32 -10 v10 z" fill="#f6e7c7" />
+    <rect x="106" y="120" width="48" height="9" rx="3" fill="url(#woodDark)" />
+    <rect x="106" y="318" width="48" height="9" rx="3" fill="url(#woodDark)" />
+    <rect x="106" y="548" width="48" height="16" rx="5" fill="url(#woodDark)" />
+  </g>
+
+  } @else {
+    <!-- Tin Whistle: Kunststoff-Kopf mit Labium, Metallrohr -->
+    <g aria-hidden="true">
+      <path d="M108 20 Q130 6 152 20 L156 156 L104 156 Z" fill="url(#plastic)" stroke="#1c2a35" stroke-width="1.5" />
+      <path d="M114 78 h32 v24 h-32 z" fill="#14232e" />
+      <path d="M114 102 l32 -11 v11 z" fill="#e9edf0" />
+      <rect x="108" y="150" width="44" height="10" rx="3" fill="#8e99a2" />
+      <rect x="110" y="158" width="40" height="404" rx="6" fill="url(#metal)" stroke="#5d6c78" stroke-width="1.5" />
+    </g>
+  }
+
+  <!-- Daumenloch: liegt auf der Rückseite -->
+  @if (isRecorder()) {
+    <line class="back-link" x1="92" x2="108" y1="150" y2="160" aria-hidden="true" />
+    <text class="back-note" x="66" y="188" text-anchor="middle" aria-hidden="true">Daumen</text>
+    <text class="back-note" x="66" y="203" text-anchor="middle" aria-hidden="true">(hinten)</text>
+  }
+
+  @for (h of holes(); track h.index) {
+    <g
+      class="hole"
+      [class.closed]="h.state === 1"
+      [class.half]="h.state === 0.5"
+      [class.thumb]="h.isThumb"
+      [class.left]="h.left"
+      [class.right]="!h.left"
+      [class.interactive]="interactive()"
+      [attr.role]="interactive() ? 'button' : null"
+      [attr.tabindex]="interactive() ? 0 : null"
+      [attr.aria-label]="interactive() ? 'Loch ' + h.label + (h.state === 1 ? ', zu' : ', offen') : null"
+      (click)="press(h.index)"
+      (keydown.enter)="press(h.index)"
+      (keydown.space)="press(h.index); $event.preventDefault()"
+    >
+      <!-- größere unsichtbare Fläche zum Antippen -->
+      <circle class="hit" [attr.cx]="h.cx" [attr.cy]="h.cy" r="29" />
+
+      @if (h.double) {
+        <circle class="bore" [attr.cx]="h.cx - 9" [attr.cy]="h.cy" r="7.5" />
+        <circle class="bore" [attr.cx]="h.cx + 9" [attr.cy]="h.cy" r="7.5" />
+      } @else {
+        <circle class="bore" [attr.cx]="h.cx" [attr.cy]="h.cy" r="11" />
+      }
+
+      <!-- Vorschau: Loch wechselt beim nächsten Ton -->
+      @if (h.changes) {
+        <circle
+          class="ring"
+          [class.to-closed]="h.nextState !== 0 && h.state === 0"
+          [attr.cx]="h.cx"
+          [attr.cy]="h.cy"
+          r="27"
+        />
+      }
+
+      <!-- Fingerpolster -->
+      <circle class="pad" [attr.cx]="h.cx" [attr.cy]="h.cy" r="23" />
+      <circle class="pad-half" [attr.cx]="h.cx - 9" [attr.cy]="h.cy" r="12" />
+      <text class="pad-label" [attr.x]="h.cx" [attr.y]="h.cy">{{ h.label }}</text>
+
+      <!-- Loch-Nummer am Rand, auch wenn offen -->
+      @if (!h.isThumb) {
+        <text class="side-label" x="186" [attr.y]="h.cy">{{ h.label }}</text>
+      }
+    </g>
+  }
+</svg>

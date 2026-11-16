@@ -1,0 +1,104 @@
+<section class="head" aria-label="Einstellungen">
+  <div class="seg" role="group" aria-label="Aufgabenart">
+    <button type="button" [attr.aria-pressed]="mode() === 'griff'" (click)="setMode('griff')">Note → Griff</button>
+    <button type="button" [attr.aria-pressed]="mode() === 'note'" (click)="setMode('note')">Griff → Note</button>
+  </div>
+  <div class="pools" role="group" aria-label="Töne auswählen">
+    @for (p of pools(); track p.id) {
+      <button type="button" class="chip" [attr.aria-pressed]="p.id === poolId()" (click)="setPool(p.id)">{{ p.title }}</button>
+    }
+  </div>
+  <p class="pool-hint">{{ pool().hint }}: {{ poolNames() }}</p>
+</section>
+
+<section class="stage">
+  <div class="card flute-card">
+    <app-flute
+      [instrument]="settings.instrument()"
+      [fingering]="fluteFingering()"
+      [next]="flutePreview()"
+      [interactive]="mode() === 'griff' && phase() === 'asking'"
+      [caption]="mode() === 'griff' ? 'Deine Griffe' : 'Griff, den du benennen sollst'"
+      (holeToggled)="toggleHole($event)"
+    />
+  </div>
+
+  <div class="card task" [class.correct]="phase() === 'correct'">
+    <h2 class="prompt">
+      @if (mode() === 'griff') {
+        Decke die Löcher für diesen Ton ab
+      } @else {
+        Wie heißt dieser Ton?
+      }
+    </h2>
+
+    <div class="staff-slot">
+      @if (showStaff()) {
+        <app-staff
+          [song]="questionSong()"
+          [currentIndex]="0"
+          [viewWidth]="250"
+          [playheadX]="170"
+          [showTime]="false"
+          [showBars]="false"
+          [showPlayhead]="false"
+        />
+        <p class="note-name">{{ targetName() }}</p>
+      } @else {
+        <p class="mystery" aria-hidden="true">?</p>
+      }
+    </div>
+
+    @if (mode() === 'note') {
+      <div class="choices" role="group" aria-label="Antworten">
+        @for (c of choices(); track c) {
+          <button
+            type="button"
+            class="choice"
+            [class.wrong]="wrongChoices().includes(c)"
+            [class.right]="phase() === 'correct' && c === targetName()"
+            [disabled]="wrongChoices().includes(c) || phase() === 'correct'"
+            (click)="choose(c)"
+          >
+            {{ c }}
+          </button>
+        }
+      </div>
+    }
+
+    <p class="feedback" role="status">
+      @if (phase() === 'correct') {
+        Richtig! Das war {{ targetName() }}.
+      } @else if (wrongChoices().length) {
+        Nicht ganz – versuch es noch einmal.
+      } @else if (hint()) {
+        Gestrichelte Ringe zeigen, welche Löcher du ändern musst.
+      }
+    </p>
+
+    <div class="actions">
+      <button type="button" class="ghost" (click)="listen()">Ton anhören</button>
+      @if (mode() === 'griff') {
+        <button type="button" class="ghost" [attr.aria-pressed]="hint()" (click)="toggleHint()">Hinweis</button>
+        <button type="button" class="ghost" (click)="clear()">Alle öffnen</button>
+      }
+      <button type="button" class="ghost" (click)="next()">Überspringen</button>
+    </div>
+
+    <p class="goal">
+      <app-stars [value]="poolStars()" style="--stars-width: 54px" />
+      <span>
+        Sterne bei {{ goals[0] }}, {{ goals[1] }} und {{ goals[2] }} richtigen Antworten in Folge – ohne Hinweis und
+        ohne Fehlversuch.
+      </span>
+    </p>
+
+    <p class="score">
+      Richtig in Folge: <b>{{ streak() }}</b>
+      <span class="sep"></span>
+      Beste Serie: <b>{{ best() }}</b>
+      <span class="sep"></span>
+      Gelöst: <b>{{ solved() }}</b>
+    </p>
+  </div>
+</section>

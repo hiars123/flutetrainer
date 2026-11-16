@@ -1,0 +1,171 @@
+<nav class="picker" aria-label="Stück auswählen">
+  @for (s of songs(); track s.id) {
+    <button
+      type="button"
+      class="pick"
+      [class.active]="s.id === player.song().id"
+      [attr.aria-pressed]="s.id === player.song().id"
+      (click)="choose(s)"
+    >
+      <span class="pick-title">{{ s.title }}</span>
+      <span class="pick-sub">{{ s.subtitle }}</span>
+    </button>
+  }
+</nav>
+
+<section class="stage" aria-label="Übungsbereich">
+  <div class="card staff-card">
+    <app-staff
+      [song]="player.written()"
+      [beat]="player.beat()"
+      [currentIndex]="player.currentIndex()"
+      [results]="playAlong.results()"
+      [smooth]="wait.running()"
+    />
+    <p class="song-info">
+      <span>{{ songInfo() }}</span>
+      <span class="stars-line"><app-stars [value]="songStars()" style="--stars-width: 54px" /></span>
+    </p>
+  </div>
+
+  <div class="card flute-card">
+    <app-flute
+      [instrument]="settings.instrument()"
+      [fingering]="player.currentFingering()"
+      [next]="player.playing() || wait.running() ? player.nextFingering() : null"
+      [caption]="'Griff für ' + readout().big"
+    />
+    <p class="legend">Gestrichelter Ring: Hier wechselt der Griff beim nächsten Ton.</p>
+  </div>
+
+  <div class="card panel">
+    <div class="readout" [class.rest]="readout().rest" aria-live="off">
+      <span class="big">{{ readout().big }}</span>
+      <span class="small">{{ readout().small }}</span>
+    </div>
+
+    <div class="beats" aria-hidden="true">
+      @for (i of barBeats(); track i) {
+        <span class="beat-dot" [class.on]="beatInBar() === i" [class.first]="i === 0"></span>
+      }
+    </div>
+
+    <div class="transport">
+      <button type="button" class="play" (click)="onStart()">
+        @if (player.playing() || wait.running()) {
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h4v14H7zM13 5h4v14h-4z" /></svg>
+          Pause
+        } @else {
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" /></svg>
+          Start
+        }
+      </button>
+      <button type="button" class="stop" (click)="onStop()" aria-label="Zurück zum Anfang">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10v10H7z" /></svg>
+      </button>
+    </div>
+
+    @if (!wait.enabled()) {
+    <div class="tempo">
+      <label for="tempo">Tempo</label>
+      <div class="tempo-row">
+        <button type="button" class="step" (click)="nudge(-4)" aria-label="Langsamer">−</button>
+        <input
+          id="tempo"
+          type="range"
+          [min]="minBpm"
+          [max]="maxBpm"
+          [value]="player.bpm()"
+          (input)="onTempo($event)"
+          [attr.aria-valuetext]="player.bpm() + ' Schläge pro Minute'"
+        />
+        <button type="button" class="step" (click)="nudge(4)" aria-label="Schneller">+</button>
+      </div>
+      <output class="bpm"><b>{{ player.bpm() }}</b> Schläge pro Minute</output>
+    </div>
+    }
+
+    @if (settings.microphoneFeature()) {
+      <div class="mic" [class.on]="mic.state() === 'listening'">
+        <button
+          type="button"
+          class="chip"
+          [attr.aria-pressed]="mic.state() === 'listening'"
+          [disabled]="mic.state() === 'starting'"
+          (click)="toggleMic()"
+        >
+          Mikrofon
+        </button>
+        @if (mic.state() === 'listening') {
+          <div class="heard" aria-live="off">
+            <span class="heard-label">Du spielst</span>
+            <b class="heard-note" [class.ok]="inTune()">{{ heard() }}</b>
+            <span class="tune" aria-hidden="true">
+              <i class="tune-mid"></i>
+              <i class="tune-dot" [class.ok]="inTune()" [style.left.%]="tunePosition()"></i>
+            </span>
+          </div>
+          @if (playAlong.summary().total > 0) {
+            <p class="score" role="status">
+              Getroffen: <b>{{ playAlong.summary().hits }}</b> von {{ playAlong.summary().total }} Noten
+            </p>
+          }
+          <div class="wait-row">
+            <button
+              type="button"
+              class="chip"
+              [attr.aria-pressed]="wait.enabled()"
+              (click)="toggleWait()"
+            >
+              Warte-Modus
+            </button>
+            @if (wait.enabled()) {
+              <button type="button" class="chip" (click)="wait.hear()">Ton anhören</button>
+            }
+          </div>
+          <p class="mic-tip">
+            @if (wait.enabled()) {
+              Das Stück wartet auf dich: Es geht erst weiter, wenn du den richtigen Ton spielst.
+            } @else {
+              Tipp: Mit Kopfhörern spielen, sonst hört das Mikrofon das Metronom.
+            }
+          </p>
+        }
+        @if (mic.state() === 'error') {
+          <p class="mic-error" role="alert">{{ mic.error() }}</p>
+        }
+      </div>
+    }
+
+    <div class="extras">
+    @if (!(mic.state() === 'listening' && settings.microphoneFeature())) {
+      <div class="practiced">
+        <button type="button" class="chip" [disabled]="songStars() > 0" (click)="markPracticed()">
+          @if (songStars() > 0) {
+            Als geübt markiert
+          } @else {
+            Ich habe es geschafft
+          }
+        </button>
+      </div>
+    }
+
+    @if (!wait.enabled()) {
+    <div class="toggles">
+      <button type="button" class="chip" [attr.aria-pressed]="player.metronome()" (click)="player.metronome.set(!player.metronome())">
+        Metronom
+      </button>
+      <button type="button" class="chip" [attr.aria-pressed]="player.sound()" (click)="player.sound.set(!player.sound())">
+        Flötenton
+      </button>
+      <button type="button" class="chip" [attr.aria-pressed]="player.countIn()" (click)="player.countIn.set(!player.countIn())">
+        Einzählen
+      </button>
+      <button type="button" class="chip" [attr.aria-pressed]="player.loop()" (click)="player.loop.set(!player.loop())">
+        Wiederholen
+      </button>
+    </div>
+    }
+    </div>
+  </div>
+</section>

@@ -1,0 +1,174 @@
+:host {
+  display: block;
+}
+
+.flute {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+}
+
+.beak {
+  stroke: #6b4a22;
+  stroke-width: 1.5;
+}
+
+/* Loch-Öffnung */
+.bore {
+  fill: #2a1c10;
+}
+
+/* Fingerpolster: erscheinen beim Zudecken mit einer kleinen Federung */
+.pad,
+.pad-half {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(0);
+  opacity: 0;
+  transition:
+    transform 0.16s cubic-bezier(0.3, 1.5, 0.5, 1),
+    opacity 0.1s;
+  pointer-events: none;
+}
+.pad-half {
+  display: none;
+}
+.hole.half .pad-half {
+  display: block;
+  transform: scale(1);
+  opacity: 1;
+}
+.hole.closed .pad {
+  transform: scale(1);
+  opacity: 1;
+}
+.hole.left .pad,
+.hole.left .pad-half {
+  fill: var(--hand-left);
+}
+.hole.right .pad,
+.hole.right .pad-half {
+  fill: var(--hand-right);
+}
+
+.pad-label {
+  font-size: 19px;
+  font-weight: 700;
+  text-anchor: middle;
+  dominant-baseline: central;
+  fill: #fff;
+  opacity: 0;
+  transition: opacity 0.12s;
+  pointer-events: none;
+  font-feature-settings: 'tnum';
+}
+.hole.closed .pad-label {
+  opacity: 1;
+}
+.hole.right .pad-label {
+  fill: var(--hand-right-ink);
+}
+/* Daumen-Beschriftung: bei offenem Daumenloch sichtbar */
+.hole.thumb .pad-label {
+  font-size: 16px;
+}
+
+.side-label {
+  font-size: 15px;
+  font-weight: 500;
+  text-anchor: middle;
+  dominant-baseline: central;
+  fill: var(--muted);
+}
+.hole.closed .side-label {
+  font-weight: 800;
+}
+.hole.left.closed .side-label {
+  fill: var(--hand-left);
+}
+.hole.right.closed .side-label {
+  fill: var(--hand-right-dark);
+}
+
+/* Vorschau-Ring */
+.ring {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 3;
+  stroke-dasharray: 5 5;
+  animation: pulse 1.1s ease-in-out infinite;
+  pointer-events: none;
+}
+.hole.left .ring.to-closed {
+  stroke: var(--hand-left);
+}
+.hole.right .ring.to-closed {
+  stroke: var(--hand-right-dark);
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.hit {
+  fill: transparent;
+}
+.hole.interactive {
+  cursor: pointer;
+}
+.hole.interactive:hover .bore {
+  fill: #4a3320;
+}
+.hole.interactive:focus-visible {
+  outline: none;
+}
+.hole.interactive:focus-visible .hit {
+  stroke: var(--focus);
+  stroke-width: 3;
+}
+
+.back-link {
+  stroke: #7d5628;
+  stroke-width: 2;
+  stroke-dasharray: 3 3;
+}
+.back-note {
+  font-size: 12px;
+  fill: var(--muted);
+}
+
+.hand-line {
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+.hand-line.left {
+  stroke: var(--hand-left);
+}
+.hand-line.right {
+  stroke: var(--hand-right);
+}
+.hand-text {
+  font-size: 14px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+.hand-text.left {
+  fill: var(--hand-left);
+}
+.hand-text.right {
+  fill: var(--hand-right-dark);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pad,
+  .pad-half,
+  .pad-label {
+    transition: none;
+  }
+  .ring {
+    animation: none;
+  }
+}

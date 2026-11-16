@@ -1,0 +1,77 @@
+<svg
+  class="staff"
+  [attr.viewBox]="'0 0 ' + viewWidth() + ' ' + height"
+  role="img"
+  aria-label="Notenzeile mit Abspiellinie"
+>
+  <defs>
+    <clipPath [attr.id]="clipId">
+      <rect [attr.x]="clipX()" y="0" [attr.width]="viewWidth() - clipX()" [attr.height]="height" />
+    </clipPath>
+  </defs>
+
+  @for (y of lineYs; track y) {
+    <line class="line" x1="4" [attr.x2]="viewWidth() - 4" [attr.y1]="y" [attr.y2]="y" />
+  }
+
+  <g [attr.clip-path]="'url(#' + clipId + ')'">
+    <g class="scroll" [class.smooth]="smooth()" [style.transform]="scroll()">
+      @if (showBars()) {
+        @for (bar of layout().bars; track bar.x) {
+          <line
+            class="bar"
+            [class.final]="bar.final"
+            [attr.x1]="bar.x"
+            [attr.x2]="bar.x"
+            [attr.y1]="lineYs[4]"
+            [attr.y2]="lineYs[0]"
+          />
+        }
+      }
+
+      @for (n of layout().items; track n.index) {
+        <g [class]="'note ' + stateOf(n.index) + ' ' + resultOf(n.index)">
+          @for (l of n.ledgers; track l.y) {
+            <line class="ledger" [attr.x1]="l.x1" [attr.x2]="l.x2" [attr.y1]="l.y" [attr.y2]="l.y" />
+          }
+          @if (n.accidentalD) {
+            <path class="glyph" [attr.d]="n.accidentalD" [attr.transform]="n.accidentalTransform" />
+          }
+          <path class="glyph" [attr.d]="n.glyphD" [attr.transform]="n.glyphTransform" />
+          @if (n.stem) {
+            <line class="stem" [attr.x1]="n.stem.x" [attr.x2]="n.stem.x" [attr.y1]="n.stem.y1" [attr.y2]="n.stem.y2" />
+          }
+          @if (n.flagTransform) {
+            <path class="glyph" [attr.d]="flagD" [attr.transform]="n.flagTransform" />
+          }
+          @for (d of n.dots; track $index) {
+            <circle class="dot" [attr.cx]="d.x" [attr.cy]="d.y" r="2.4" />
+          }
+          @if (n.syllable) {
+            <text class="syllable" [attr.x]="n.x" [attr.y]="lyricY">{{ n.syllable }}</text>
+          }
+        </g>
+      }
+    </g>
+  </g>
+
+  <!-- Notenschlüssel und Taktart stehen fest links -->
+  <path class="clef" [attr.d]="clef" [attr.transform]="clefTransform" />
+  @for (k of keySignature().items; track $index) {
+    <path class="clef" [attr.d]="k.d" [attr.transform]="k.transform" />
+  }
+  @if (showTime()) {
+    <g class="time" aria-hidden="true">
+      <text [attr.x]="timeX()" [attr.y]="timeTop">{{ song().beatsPerBar }}</text>
+      <text [attr.x]="timeX()" [attr.y]="timeBottom">4</text>
+    </g>
+  }
+
+  <!-- Abspiellinie -->
+  @if (showPlayhead()) {
+    <g class="playhead" aria-hidden="true">
+      <line [attr.x1]="playheadX()" [attr.x2]="playheadX()" y1="26" [attr.y2]="lyricY + 10" />
+      <path [attr.d]="'M' + (playheadX() - 7) + ' 18 L' + (playheadX() + 7) + ' 18 L' + playheadX() + ' 30 Z'" />
+    </g>
+  }
+</svg>

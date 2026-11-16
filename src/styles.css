@@ -1,0 +1,64 @@
+@import '@fontsource/atkinson-hyperlegible-next/400.css';
+@import '@fontsource/atkinson-hyperlegible-next/600.css';
+@import '@fontsource/atkinson-hyperlegible-next/700.css';
+@import '@fontsource/atkinson-hyperlegible-next/800.css';
+
+:root {
+  --paper: #e9edf0;
+  --card: #ffffff;
+  --ink: #14232e;
+  --muted: #5d6c78;
+  --line: #cdd5db;
+  --now: #c2255c;
+  --good: #1f8a5b;
+  --bad: #c0392b;
+  --hand-left: #2b5fd9;
+  --hand-right: #f0a21a;
+  --hand-right-dark: #a66a00;
+  --hand-right-ink: #2a1a00;
+  --focus: #2b5fd9;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Atkinson Hyperlegible Next', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+button:disabled {
+  cursor: default;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 18px;
+  box-shadow: 0 1px 0 rgba(20, 35, 46, 0.06), 0 0 0 1px rgba(20, 35, 46, 0.07);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

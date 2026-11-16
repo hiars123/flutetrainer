@@ -1,0 +1,77 @@
+<section class="card summary" aria-labelledby="h-path">
+  <div class="summary-text">
+    <h2 id="h-path">Dein Lernpfad</h2>
+    <p>
+      Ein Stern pro Schritt schaltet den nächsten frei. Lieder spielst du mit Mikrofon bewertet oder bestätigst sie
+      selbst; im Griff-Quiz zählen richtige Antworten in Folge.
+    </p>
+  </div>
+  <div class="meter" role="group" aria-label="Fortschritt">
+    <p class="count">
+      <b>{{ summary().done }}</b> von {{ summary().total }} Schritten geschafft
+    </p>
+    <div class="bar" aria-hidden="true"><i [style.width.%]="summary().ratio * 100"></i></div>
+    <p class="sub">{{ summary().stars }} von {{ summary().maxStars }} Sternen</p>
+  </div>
+</section>
+
+@for (group of groups(); track group.title) {
+  <section class="group" [attr.aria-label]="group.title">
+    <div class="group-head">
+      <h3>{{ group.title }}</h3>
+      <p>{{ group.intro }}</p>
+    </div>
+    <ol class="steps">
+      @for (step of group.steps; track step.id) {
+        <li [class]="'step ' + step.status">
+          <button
+            type="button"
+            class="card step-btn"
+            [attr.aria-disabled]="step.status === 'locked'"
+            [attr.aria-label]="
+              step.title +
+              (step.status === 'locked' ? ', gesperrt. Schließe zuerst „' + step.after + '“ ab' : '') +
+              (step.status === 'done' ? ', ' + step.stars + ' von 3 Sternen' : '')
+            "
+            (click)="start(step)"
+          >
+            <span class="node" aria-hidden="true">
+              @switch (step.status) {
+                @case ('done') {
+                  <svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+                }
+                @case ('locked') {
+                  <svg viewBox="0 0 24 24"><path d="M7 11V8a5 5 0 0 1 10 0v3M6 11h12v9H6z" /></svg>
+                }
+                @default {
+                  {{ step.number }}
+                }
+              }
+            </span>
+            <span class="body">
+              <span class="title">{{ step.title }}</span>
+              <span class="text">
+                @if (step.status === 'locked') {
+                  Zuerst „{{ step.after }}“ abschließen
+                } @else {
+                  {{ step.text }}
+                }
+              </span>
+            </span>
+            <span class="side">
+              <span class="kind">{{ step.kind === 'song' ? 'Spielen' : 'Quiz' }}</span>
+              <app-stars [value]="step.stars" style="--stars-width: 54px" />
+            </span>
+          </button>
+        </li>
+      }
+    </ol>
+  </section>
+}
+
+<section class="options">
+  <button type="button" class="chip" [attr.aria-pressed]="progress.unlockAll()" (click)="toggleUnlockAll()">
+    Alle Schritte freischalten
+  </button>
+  <button type="button" class="chip" (click)="reset()">Sterne zurücksetzen</button>
+</section>

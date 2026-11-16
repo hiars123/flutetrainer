@@ -1,0 +1,195 @@
+:host {
+  display: block;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.summary {
+  padding: 18px 20px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr minmax(180px, 240px);
+  align-items: center;
+  margin-bottom: 18px;
+}
+.summary h2 {
+  margin: 0 0 4px;
+  font-size: 1.3rem;
+}
+.summary p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.meter {
+  display: grid;
+  gap: 6px;
+}
+.meter .count {
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+.meter .count b {
+  font-size: 1.4rem;
+}
+.bar {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--paper);
+  overflow: hidden;
+}
+.bar i {
+  display: block;
+  height: 100%;
+  border-radius: 5px;
+  background: var(--good);
+  transition: width 0.4s ease-out;
+}
+
+.group {
+  margin-bottom: 22px;
+}
+.group-head {
+  margin: 0 4px 10px;
+}
+.group-head h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+.group-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  position: relative;
+}
+/* Verbindungslinie hinter den Knoten */
+.steps::before {
+  content: '';
+  position: absolute;
+  left: 32px;
+  top: 24px;
+  bottom: 24px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--line);
+}
+
+.step-btn {
+  position: relative;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 14px;
+  align-items: center;
+  padding: 10px 14px 10px 10px;
+  text-align: left;
+  color: var(--ink);
+  border: none;
+  font: inherit;
+}
+.step.locked .step-btn {
+  cursor: default;
+  background: #f3f5f7;
+  color: var(--muted);
+}
+.step.open .step-btn {
+  box-shadow: 0 0 0 2px var(--ink);
+}
+
+.node {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 1.05rem;
+  background: var(--ink);
+  color: #fff;
+}
+.node svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.step.done .node {
+  background: var(--good);
+}
+.step.locked .node {
+  background: var(--line);
+  color: var(--muted);
+}
+
+.body {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.title {
+  font-weight: 700;
+  font-size: 1.02rem;
+}
+.text {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+.side {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+}
+.kind {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.chip {
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1.5px solid var(--line);
+  background: var(--card);
+  color: var(--muted);
+  font-weight: 600;
+}
+.chip[aria-pressed='true'] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: #fff;
+}
+
+@media (max-width: 560px) {
+  .summary {
+    grid-template-columns: 1fr;
+  }
+  .step-btn {
+    grid-template-columns: 40px 1fr auto;
+    gap: 10px;
+  }
+  .node {
+    width: 40px;
+    height: 40px;
+  }
+  .steps::before {
+    left: 30px;
+  }
+}
